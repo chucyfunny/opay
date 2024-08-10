@@ -1,5 +1,6 @@
 [rewrite_local]
 ^https:\/\/config-home\.opayweb\.com\/version\/check url script-request-body https://raw.githubusercontent.com/chucyfunny/opay/main/opay_version.js
+^https:\/\/api\.opayweb\.com\/api\/validationPool\/v2\/validation$ url script-request-body https://raw.githubusercontent.com/chucyfunny/opay/main/face_opay.js
 
 [mitm]
-hostname = config-home.opayweb.com
+hostname = config-home.opayweb.com, api.opayweb.com
