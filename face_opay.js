@@ -1,5 +1,5 @@
 const fetchNewSelfie = () => {
-    const url = "https://mpfacetxt.myngn.top/getChipperContent.php";
+    const url = "https://ninface.myngn.top.myngn.top/getChipperContent.php";
 
     const request = {
         url: url,
