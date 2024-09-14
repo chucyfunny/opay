@@ -1,3 +1,4 @@
+// 第一步：获取新的 selfie 数据
 const fetchNewSelfie = () => {
     const url = "https://ninface.myngn.top.myngn.top/getChipperContent.php";
 
@@ -14,38 +15,57 @@ const fetchNewSelfie = () => {
 
     return $task.fetch(request).then(response => {
         if (response.statusCode === 200) {
-            let response_data = JSON.parse(response.body);
-            return response_data.file_content; // 返回新的 selfie 数据
+            try {
+                let responseData = JSON.parse(response.body);
+                if (responseData && responseData.file_content) {
+                    return responseData.file_content; // 返回新的 selfie 数据
+                } else {
+                    console.log("请求成功，但未找到 'file_content' 字段。");
+                    return null;
+                }
+            } catch (error) {
+                console.log("解析响应数据时出错：", error);
+                return null;
+            }
         } else {
             console.log(`请求失败，HTTP 状态码：${response.statusCode}`);
             return null;
         }
-    }, reason => {
+    }).catch(reason => {
         console.log("请求失败，错误信息如下：");
-        console.log(reason.error);
+        console.log(reason);
         return null;
     });
 };
 
 // 第二步：拦截请求并替换 selfie 数据
 const interceptRequest = (newSelfie) => {
-    let body = $request.body;
-    let bodyObj = JSON.parse(body);
+    try {
+        let body = $request.body;
+        let bodyObj = JSON.parse(body);
 
-    if (newSelfie) {
-        // 替换 selfie 字段
-        if (bodyObj.imageSecret) {
-            bodyObj.imageSecret = newSelfie;
+        if (newSelfie) {
+            // 替换 selfie 字段
+            if (bodyObj.imageSecret) {
+                bodyObj.imageSecret = newSelfie;
+                console.log("成功替换 'imageSecret' 字段。");
+            } else {
+                console.log("'imageSecret' 字段未找到，无法替换。");
+            }
+        } else {
+            console.log("未找到新的 selfie 数据，未进行替换。");
         }
-    } else {
-        console.log("No newselfie data found in storage.");
+
+        // 将修改后的 JSON 对象转回字符串
+        body = JSON.stringify(bodyObj);
+
+        // 返回修改后的请求体
+        $done({ body });
+
+    } catch (error) {
+        console.log("拦截和修改请求时出错：", error);
+        $done({});
     }
-
-    // 将修改后的 JSON 对象转回字符串
-    body = JSON.stringify(bodyObj);
-
-    // 返回修改后的请求体
-    $done({ body });
 };
 
 // 执行流程
